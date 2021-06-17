@@ -186,7 +186,7 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
     <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
     <channel>
       <title>${shop.name}</title>
-      <link>https://${shop.domains[0]}</link>
+      <link>BASE_URL</link>
       <description>${shop.description}</description>`;
 
   Logger.debug("generateXML started");
