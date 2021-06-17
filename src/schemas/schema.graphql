@@ -1,0 +1,36 @@
+extend type Mutation {
+  "Generate Google Shopping feed documents"
+  generateGoogleShoppingFeeds(
+    "Mutation input"
+    input: GenerateGoogleShoppingFeedsInput
+  ): GenerateGoogleShoppingFeedsPayload!
+}
+
+"Input for the `generateGoogleShoppingFeeds` mutation"
+input GenerateGoogleShoppingFeedsInput {
+  "An optional string identifying the mutation call, which will be returned in the response payload"
+  clientMutationId: String
+
+  "The ID of the shop to generate the Google Shopping feed for"
+  shopId: ID!
+}
+
+"Response for the `generateGoogleShoppingFeeds` mutation"
+type GenerateGoogleShoppingFeedsPayload {
+  "The same string you sent with the mutation params, for matching mutation calls with their responses"
+  clientMutationId: String
+
+  "Whether the feed generation job was successfully scheduled"
+  wasJobScheduled: Boolean!
+}
+
+extend type Query {
+  "Returns Sitemap object (because a Google Shopping feed is similar to a sitemap) for a shop based on the handle param"
+  googleShoppingFeed(
+    "The Google Shopping feed handle"
+    handle: String!,
+
+    "Shop URL"
+    shopUrl: String!
+  ): Sitemap
+}

@@ -1,0 +1,14 @@
+extend type ShopSettings {
+  "This setting controls how often the feeds for the shop will be rebuilt"
+  googleShoppingFeedRefreshPeriod: String!
+
+  "This setting controls which country to show the shipping rates for in the Google Shopping feed"
+  googleShoppingShippingCountry: String!
+}
+
+extend input ShopSettingsUpdates {
+  "This setting controls how often the feeds for the shop will be rebuilt"
+  googleShoppingFeedRefreshPeriod: String
+
+  googleShoppingShippingCountry: String
+}

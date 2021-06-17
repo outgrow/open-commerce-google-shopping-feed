@@ -1,0 +1,26 @@
+[{
+  "i18n": "en",
+  "ns": "reaction-google-shopping-feed",
+  "translation": {
+    "reaction-google-shopping-feed": {
+      "shopSettings": {
+        "refreshGoogleShoppingFeedsNow": "Refresh Google Shopping feed",
+        "feedRefreshInitiated": "Refreshing the Google Shopping feed can take up to 5 minutes. You will be notified when it is completed.",
+        "feedRefreshFailed": "Google Shopping feed refresh failed"
+      },
+      "FeedSettings": {
+        "cardErrorContent": "Unable to load Google Shopping feed settings",
+        "cardTitle": "Google Shopping XML feeds",
+        "refreshPeriodFieldLabel": "Automatically refresh Google Shopping feed",
+        "refreshPeriodFieldPlaceholder": "Select a frequency",
+        "viewFeedButtonText": "View Google Shopping XML feed"
+      },
+      "productDetailEdit": {
+        "shouldAppearInFeed": "Include in Google Shopping feed?",
+        "refreshFeed": "Refresh Google Shopping feed now?",
+        "refreshFeedYes": "Yes, refresh",
+        "refreshFeedNo": "No, don't refresh"
+      }
+    }
+  }
+}]

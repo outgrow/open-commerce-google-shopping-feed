@@ -1,0 +1,23 @@
+[
+  {
+    "description": "Shop managers acting on specific entities.",
+    "subjects": [ "reaction:groups:shop-managers" ],
+    "resources": [ "reaction:legacy:shops:*" ],
+    "actions": [
+      "read",
+      "update"
+    ],
+    "effect": "allow"
+  },
+  {
+    "description": "Google Shopping feed managers acting on specific entities.",
+    "subjects": [ "reaction:groups:google-shopping-feed-managers" ],
+    "resources": [ "reaction:legacy:googleShoppingFeeds" ],
+    "actions": [
+      "read",
+      "update",
+      "update:settings"
+    ],
+    "effect": "allow"
+  }
+]
