@@ -220,7 +220,7 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
     xml += `
       <item>
         <g:title>${title}</g:title>
-        <g:link>${url}</link>
+        <g:link>${url}</g:link>
         <g:description>${description}</g:description>
         <g:image_link>${primaryImageUrl}</g:image_link>
         <g:price>${price}</g:price>
