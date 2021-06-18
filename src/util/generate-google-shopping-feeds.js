@@ -222,7 +222,7 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
         <g:title>${title}</g:title>
         <g:link>${url}</g:link>
         <g:description>${description}</g:description>
-        <g:image_link>${primaryImageUrl}</g:image_link>
+        <g:image_link>MEDIA_BASE_URL${primaryImageUrl}</g:image_link>
         <g:price>${price}</g:price>
         <g:condition>new</g:condition>
         <g:id>${sku || _id}</g:id>
@@ -230,7 +230,7 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
         ${barcode && `<g:gtin>${barcode}</g:gtin>`}
         ${vendor && `<g:brand>${vendor}</g:brand>`}
         <g:availability>${isSoldOut ? "out of stock" : "in stock"}</g:availability>
-        ${imageUrls.map((imageUrl) => `<g:additional_image_link>${imageUrl}</g:additional_image_link>`)}
+        ${imageUrls.map((imageUrl) => `<g:additional_image_link>MEDIA_BASE_URL${imageUrl}</g:additional_image_link>`)}
         ${applicableShippingMethods.map((method) => `
           <g:shipping>
             <g:country>${googleShoppingShippingCountry}</g:country>
