@@ -157,7 +157,7 @@ async function getProductFeedItems(context, shopId) {
     return {
       _id,
       barcode,
-      description: stripHtml(description).result.replaceAll(/\\n/g, " "), // strip out potential HTML tags and replace line breaks with spaces
+      description: stripHtml(description).result.replace(/\\n/g, " "), // strip out potential HTML tags and replace line breaks with spaces
       imageUrls: media.map((image) => image.URLs.large).filter((url) => url !== primaryImageUrl),
       primaryImageUrl,
       isSoldOut,
