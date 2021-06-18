@@ -157,7 +157,7 @@ async function getProductFeedItems(context, shopId) {
     return {
       _id,
       barcode,
-      description: stripHtml(description).result,
+      description: stripHtml(description).result.replaceAll(/\\n/g, " "), // strip out potential HTML tags and replace line breaks with spaces
       imageUrls: media.map((image) => image.URLs.large).filter((url) => url !== primaryImageUrl),
       primaryImageUrl,
       isSoldOut,
@@ -222,22 +222,20 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
         <g:title>${title}</g:title>
         <g:link>${url}</g:link>
         <g:description>${description}</g:description>
-        <g:image_link>MEDIA_BASE_URL${primaryImageUrl}</g:image_link>
+        <g:image_link>MEDIA_URL${primaryImageUrl}</g:image_link>
         <g:price>${price}</g:price>
         <g:condition>new</g:condition>
         <g:id>${sku || _id}</g:id>
-        ${sku && `<g:mpn>${sku}</g:mpn>`}
-        ${barcode && `<g:gtin>${barcode}</g:gtin>`}
-        ${vendor && `<g:brand>${vendor}</g:brand>`}
+        ${sku ? `<g:mpn>${sku}</g:mpn>` : ""}
+        ${barcode ? `<g:gtin>${barcode}</g:gtin>` : ""}
+        ${vendor ? `<g:brand>${vendor}</g:brand>` : ""}
         <g:availability>${isSoldOut ? "out of stock" : "in stock"}</g:availability>
-        ${imageUrls.map((imageUrl) => `<g:additional_image_link>MEDIA_BASE_URL${imageUrl}</g:additional_image_link>`)}
-        ${applicableShippingMethods.map((method) => `
-          <g:shipping>
-            <g:country>${googleShoppingShippingCountry}</g:country>
-            <g:service>${method.label}</g:service>
-            <g:price>${method.rate}</g:price>
-          </g:shipping>
-        `)}
+        ${imageUrls.map((imageUrl) => `<g:additional_image_link>MEDIA_URL${imageUrl}</g:additional_image_link>`)}
+        ${applicableShippingMethods.map((method) => `<g:shipping>
+          <g:country>${googleShoppingShippingCountry}</g:country>
+          <g:service>${method.label}</g:service>
+          <g:price>${method.rate}</g:price>
+        </g:shipping>`)}
       </item>
     `;
   });

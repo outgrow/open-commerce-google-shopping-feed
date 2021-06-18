@@ -24,7 +24,7 @@ export default async function googleShoppingFeedQuery(context, { handle, shopUrl
 
   googleShoppingFeed.xml = googleShoppingFeed.xml
     .replace(/BASE_URL/g, shopUrl)
-    .replace(/MEDIA_BASE_URL/g, apiUrl);
+    .replace(/MEDIA_URL/g, apiUrl);
 
   return googleShoppingFeed;
 }
