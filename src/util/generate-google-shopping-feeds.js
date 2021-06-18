@@ -157,14 +157,14 @@ async function getProductFeedItems(context, shopId) {
     return {
       _id,
       barcode,
-      description: stripHtml(description).result.replace(/\\n/g, " "), // strip out potential HTML tags and replace line breaks with spaces
+      description: encodeURIComponent(stripHtml(description).result.replace(/\\n/g, " ")), // strip out potential HTML tags and replace line breaks with spaces, and UTF-8 encode
       imageUrls: media.map((image) => image.URLs.large).filter((url) => url !== primaryImageUrl),
       primaryImageUrl,
       isSoldOut,
       price: pricing?.AED?.displayPrice,
       sku,
       supportedFulfillmentTypes,
-      title,
+      title: encodeURIComponent(title),
       url: `BASE_URL/product/${slug}`,
       vendor
     };
