@@ -9,11 +9,12 @@
  */
 export default async function googleShoppingFeedQuery(context, { handle, shopUrl }) {
   const { GoogleShoppingFeeds, Shops } = context.collections;
-  const domain = new URL(shopUrl.trim()).hostname;
+  const { rootUrl: apiUrl } = context;
+  const storefrontDomain = new URL(shopUrl.trim()).hostname;
   const trimmedHandle = handle.trim();
 
   // ensure the domain requested is for a known shop domain
-  const { _id: shopId } = await Shops.findOne({ domains: domain }) || {};
+  const { _id: shopId } = await Shops.findOne({ domains: storefrontDomain }) || {};
 
   if (!shopId) return null;
 
@@ -21,7 +22,9 @@ export default async function googleShoppingFeedQuery(context, { handle, shopUrl
 
   if (!googleShoppingFeed) return null;
 
-  googleShoppingFeed.xml = googleShoppingFeed.xml.replace(/BASE_URL/g, shopUrl);
+  googleShoppingFeed.xml = googleShoppingFeed.xml
+    .replace(/BASE_URL/g, shopUrl)
+    .replace(/MEDIA_BASE_URL/g, apiUrl);
 
   return googleShoppingFeed;
 }
