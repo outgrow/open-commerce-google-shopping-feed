@@ -160,18 +160,18 @@ async function getProductFeedItems(context, shopId) {
 
     return {
       _id: entities.encodeXML(_id),
-      barcode: entities.encodeXML(barcode),
+      barcode: barcode ? entities.encodeXML(barcode) : null,
       currency: firstFoundCurrency,
-      description: entities.encodeXML(stripHtml(description).result), // strip out potential HTML tags
+      description: description ? entities.encodeXML(stripHtml(description).result) : null, // strip out potential HTML tags
       imageUrls: media.map((image) => image.URLs.large).filter((url) => url !== primaryImageUrl),
       primaryImageUrl,
       isSoldOut,
       price: `${firstFoundCurrencyPricing?.minPrice ? firstFoundCurrencyPricing?.minPrice : firstFoundCurrencyPricing?.price} ${firstFoundCurrency}`,
-      sku: entities.encodeXML(sku),
+      sku: sku ? entities.encodeXML(sku) : null,
       supportedFulfillmentTypes,
-      title: entities.encodeXML(title),
+      title: title ? entities.encodeXML(title) : null,
       url: `BASE_URL/product/${slug}`,
-      vendor: entities.encodeXML(vendor)
+      vendor: vendor ? entities.encodeXML(vendor) : null
     };
   });
 }
