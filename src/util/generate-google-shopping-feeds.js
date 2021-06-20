@@ -166,7 +166,7 @@ async function getProductFeedItems(context, shopId) {
       imageUrls: media.map((image) => image.URLs.large).filter((url) => url !== primaryImageUrl),
       primaryImageUrl,
       isSoldOut,
-      price: `${firstFoundCurrencyPricing?.minPrice || firstFoundCurrencyPricing?.price} ${firstFoundCurrency}`,
+      price: `${firstFoundCurrencyPricing?.minPrice ? firstFoundCurrencyPricing?.minPrice : firstFoundCurrencyPricing?.price} ${firstFoundCurrency}`,
       sku: entities.encodeXML(sku),
       supportedFulfillmentTypes,
       title: entities.encodeXML(title),
