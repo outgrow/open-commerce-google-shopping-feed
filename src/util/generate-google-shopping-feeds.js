@@ -206,7 +206,7 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
     const {
       _id,
       barcode,
-      currency
+      currency,
       description,
       imageUrls,
       isSoldOut,
