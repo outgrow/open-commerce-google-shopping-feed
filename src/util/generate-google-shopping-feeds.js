@@ -1,6 +1,7 @@
 import SimpleSchema from "simpl-schema";
 import Logger from "@reactioncommerce/logger";
 import ReactionError from "@reactioncommerce/reaction-error";
+import entities from "entities";
 import { stripHtml } from "string-strip-html";
 
 /**
@@ -154,19 +155,23 @@ async function getProductFeedItems(context, shopId) {
 
     const primaryImageUrl = primaryImage?.URLs?.large;
 
+    const firstFoundCurrency = Object.keys(pricing)[0];
+    const firstFoundCurrencyPricing = pricing[firstFoundCurrency];
+
     return {
-      _id,
-      barcode,
-      description: encodeURIComponent(stripHtml(description).result.replace(/\\n/g, " ")), // strip out potential HTML tags and replace line breaks with spaces, and UTF-8 encode
+      _id: entities.encodeXML(_id),
+      barcode: entities.encodeXML(barcode),
+      currency: firstFoundCurrency,
+      description: entities.encodeXML(stripHtml(description).result), // strip out potential HTML tags
       imageUrls: media.map((image) => image.URLs.large).filter((url) => url !== primaryImageUrl),
       primaryImageUrl,
       isSoldOut,
-      price: pricing?.AED?.displayPrice,
-      sku,
+      price: `${firstFoundCurrencyPricing?.minPrice || firstFoundCurrencyPricing?.price} ${firstFoundCurrency}`,
+      sku: entities.encodeXML(sku),
       supportedFulfillmentTypes,
-      title: encodeURIComponent(title),
+      title: entities.encodeXML(title),
       url: `BASE_URL/product/${slug}`,
-      vendor
+      vendor: entities.encodeXML(vendor)
     };
   });
 }
@@ -201,6 +206,7 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
     const {
       _id,
       barcode,
+      currency
       description,
       imageUrls,
       isSoldOut,
@@ -233,8 +239,8 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
         ${imageUrls.map((imageUrl) => `<g:additional_image_link>MEDIA_URL${imageUrl}</g:additional_image_link>`)}
         ${applicableShippingMethods.map((method) => `<g:shipping>
           <g:country>${googleShoppingShippingCountry}</g:country>
-          <g:service>${method.label}</g:service>
-          <g:price>${method.rate}</g:price>
+          <g:service>${entities.encodeXML(method.label)}</g:service>
+          <g:price>${method.rate} ${currency}</g:price>
         </g:shipping>`)}
       </item>
     `;
