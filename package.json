@@ -1,7 +1,7 @@
 {
   "name": "@outgrowio/open-commerce-google-shopping-feed",
   "description": "Google Shopping XML feed generator for Mailchimp Open Commerce",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "main": "index.js",
   "type": "module",
   "engines": {
