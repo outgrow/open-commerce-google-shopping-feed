@@ -1,7 +1,7 @@
 import SimpleSchema from "simpl-schema";
 import Logger from "@reactioncommerce/logger";
 import ReactionError from "@reactioncommerce/reaction-error";
-import entities from "entities";
+import entities, {encodeXML} from "entities";
 import { stripHtml } from "string-strip-html";
 
 /**
@@ -187,12 +187,24 @@ async function getProductFeedItems(context, shopId) {
  * @returns {String} - Generated XML
  */
 function generateXML(items, shop, availableShippingProviders, googleShoppingShippingCountry) {
+  let shopNameTag = "";
+  let shopDescriptionTag = "";
+
+  if (shop.name) {
+    shopNameTag = `<title>${entities.encodeXML(shop.name)}</title>`;
+  }
+
+  if (shop.description) {
+    shopDescriptionTag = `<description>${entities.encodeXML(shop.description)}</description>`;
+  }
+
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
     <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
     <channel>
-      <title>${shop.name}</title>
+      ${shopNameTag}
       <link>BASE_URL</link>
-      <description>${shop.description}</description>`;
+      ${shopDescriptionTag}
+  `;
 
   Logger.debug("generateXML started");
 
