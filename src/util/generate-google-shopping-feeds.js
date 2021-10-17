@@ -1,8 +1,10 @@
 import SimpleSchema from "simpl-schema";
 import Logger from "@reactioncommerce/logger";
 import ReactionError from "@reactioncommerce/reaction-error";
-import entities, {encodeXML} from "entities";
+import entities from "entities";
 import { stripHtml } from "string-strip-html";
+import findDeepestVariants from "./find-deepest-variants.js";
+import { encodeCatalogProductVariantOpaqueId } from "../xforms/id.js";
 
 /**
  * @name GoogleShoppingFeedsSchema
@@ -16,6 +18,18 @@ export const GoogleShoppingFeedsSchema = new SimpleSchema({
   xml: String,
   createdAt: Date
 });
+
+function variantAttribute(variant) {
+  const attributeLabel = variant?.attributeLabel.toLowerCase();
+
+  if (["size", "color", "pattern", "material", "gender"].includes(attributeLabel)) {
+    return {
+      [attributeLabel]: variant.optionTitle.toLowerCase()
+    }
+  }
+
+  return {};
+}
 
 /**
  * @name generateGoogleShoppingFeeds
@@ -96,7 +110,7 @@ async function generateGoogleShoppingFeedsForShop(context, shopId) {
 
   const productFeedItems = await getProductFeedItems(context, shopId);
 
-  Logger.debug("product feed items", productFeedItems);
+  // Logger.debug("product feed items", productFeedItems);
 
   const availableShippingProviders = await Shipping.find({
     "shopId": shopId,
@@ -108,7 +122,7 @@ async function generateGoogleShoppingFeedsForShop(context, shopId) {
   // Regenerate feed index
   const newDoc = {
     shopId,
-    xml: generateXML(productFeedItems, shop, availableShippingProviders, googleShoppingShippingCountry),
+    xml: generateXML(productFeedItems.flat(), shop, availableShippingProviders, googleShoppingShippingCountry),
     handle: "google-shopping-feed.xml",
     createdAt: new Date()
   };
@@ -158,21 +172,51 @@ async function getProductFeedItems(context, shopId) {
     const firstFoundCurrency = Object.keys(pricing)[0];
     const firstFoundCurrencyPricing = pricing[firstFoundCurrency];
 
-    return {
-      _id: entities.encodeXML(_id),
-      barcode: barcode ? entities.encodeXML(barcode) : null,
-      currency: firstFoundCurrency,
-      description: description ? entities.encodeXML(stripHtml(description).result) : null, // strip out potential HTML tags
-      imageUrls: media.map((image) => image.URLs.large).filter((url) => url !== primaryImageUrl),
-      primaryImageUrl,
-      isSoldOut,
-      price: `${firstFoundCurrencyPricing?.minPrice ? firstFoundCurrencyPricing?.minPrice : firstFoundCurrencyPricing?.price} ${firstFoundCurrency}`,
-      sku: sku ? entities.encodeXML(sku) : null,
-      supportedFulfillmentTypes,
-      title: title ? entities.encodeXML(title) : null,
-      url: `BASE_URL/product/${slug}`,
-      vendor: vendor ? entities.encodeXML(vendor) : null
-    };
+    const deepestVariants = findDeepestVariants(product);
+
+    Logger.debug("deepestVariants", deepestVariants);
+
+    const transformedDeepestVariants = deepestVariants.map((variant) => {
+      const variantPrimaryImageUrl = variant.primaryImage?.URLs?.large;
+      const variantFirstFoundCurrency = Object.keys(variant.pricing)[0];
+      const variantFirstFoundCurrencyPricing = variant.pricing[variantFirstFoundCurrency];
+
+      return {
+        _id: entities.encodeXML(variant._id),
+        barcode: barcode ? entities.encodeXML(variant.barcode) : null,
+        description: description ? entities.encodeXML(stripHtml(description).result) : null, // strip out potential HTML tags
+        itemGroupId: sku ? entities.encodeXML(sku) : entities.encodeXML(_id),
+        title: variant.title ? entities.encodeXML(variant.title) : null,
+        imageUrls: variant.media.map((image) => image.URLs.large).filter((url) => url !== variantPrimaryImageUrl),
+        variantPrimaryImageUrl,
+        isSoldOut: variant.isSoldOut,
+        price: `${variantFirstFoundCurrencyPricing?.price ? variantFirstFoundCurrencyPricing?.price : variantFirstFoundCurrencyPricing?.minPrice} ${variantFirstFoundCurrency}`,
+        sku: variant.sku ? entities.encodeXML(variant.sku) : null,
+        supportedFulfillmentTypes,
+        url: `BASE_URL/product/${slug}/${encodeCatalogProductVariantOpaqueId(variant._id)}`,
+        vendor: vendor ? entities.encodeXML(vendor) : null,
+        variantAttributes: variantAttribute(variant)
+      }
+    });
+
+    return [
+      {
+        _id: entities.encodeXML(_id),
+        barcode: barcode ? entities.encodeXML(barcode) : null,
+        currency: firstFoundCurrency,
+        description: description ? entities.encodeXML(stripHtml(description).result) : null, // strip out potential HTML tags
+        imageUrls: media.map((image) => image.URLs.large).filter((url) => url !== primaryImageUrl),
+        primaryImageUrl,
+        isSoldOut,
+        price: `${firstFoundCurrencyPricing?.minPrice ? firstFoundCurrencyPricing?.minPrice : firstFoundCurrencyPricing?.price} ${firstFoundCurrency}`,
+        sku: sku ? entities.encodeXML(sku) : entities.encodeXML(_id),
+        supportedFulfillmentTypes,
+        title: title ? entities.encodeXML(title) : null,
+        url: `BASE_URL/product/${slug}`,
+        vendor: vendor ? entities.encodeXML(vendor) : null
+      },
+      ...transformedDeepestVariants
+    ];
   });
 }
 
@@ -222,12 +266,14 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
       description,
       imageUrls,
       isSoldOut,
+      itemGroupId,
       price,
       primaryImageUrl,
       sku,
       supportedFulfillmentTypes,
       title,
       url,
+      variantAttributes,
       vendor
     } = item;
 
@@ -240,7 +286,7 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
         <g:title>${title}</g:title>
         <g:link>${url}</g:link>
         <g:description>${description}</g:description>
-        <g:image_link>MEDIA_URL${primaryImageUrl}</g:image_link>
+        ${primaryImageUrl ? `<g:image_link>MEDIA_URL${primaryImageUrl}</g:image_link>` : ""}
         <g:price>${price}</g:price>
         <g:condition>new</g:condition>
         <g:id>${sku || _id}</g:id>
@@ -254,12 +300,16 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
           <g:service>${entities.encodeXML(method.label)}</g:service>
           <g:price>${method.rate} ${currency}</g:price>
         </g:shipping>`)}
+        ${itemGroupId ? `<g:item_group_id>${itemGroupId}</g:item_group_id>` : ""}
+        ${variantAttributes ? Object.keys(variantAttributes).map((variantAttribute) => `<g:${variantAttribute}>
+          ${variantAttributes[variantAttribute]}
+        </g:${variantAttribute}`) : ""}
       </item>
     `;
   });
 
   xml += "\n</channel></rss>";
 
-  Logger.debug("generateXML finish", xml);
+  // Logger.debug("generateXML finish", xml);
   return xml;
 }

@@ -6,5 +6,6 @@ const namespaces = {
 };
 
 export const encodeShopOpaqueId = encodeOpaqueId(namespaces.Shop);
+export const encodeCatalogProductVariantOpaqueId = encodeOpaqueId("reaction/catalogProductVariant");
 
 export const decodeShopOpaqueId = decodeOpaqueIdForNamespace(namespaces.Shop);
