@@ -184,6 +184,7 @@ async function getProductFeedItems(context, shopId) {
       return {
         _id: entities.encodeXML(variant._id),
         barcode: barcode ? entities.encodeXML(variant.barcode) : null,
+        currency: variantFirstFoundCurrency,
         description: description ? entities.encodeXML(stripHtml(description).result) : null, // strip out potential HTML tags
         itemGroupId: sku ? entities.encodeXML(sku) : entities.encodeXML(_id),
         title: variant.title ? entities.encodeXML(variant.title) : null,
