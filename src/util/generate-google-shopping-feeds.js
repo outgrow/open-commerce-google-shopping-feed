@@ -304,7 +304,7 @@ function generateXML(items, shop, availableShippingProviders, googleShoppingShip
         ${itemGroupId ? `<g:item_group_id>${itemGroupId}</g:item_group_id>` : ""}
         ${variantAttributes ? Object.keys(variantAttributes).map((variantAttribute) => `<g:${variantAttribute}>
           ${variantAttributes[variantAttribute]}
-        </g:${variantAttribute}`) : ""}
+        </g:${variantAttribute}>`) : ""}
       </item>
     `;
   });
