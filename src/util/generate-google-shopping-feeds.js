@@ -189,7 +189,7 @@ async function getProductFeedItems(context, shopId) {
         itemGroupId: sku ? entities.encodeXML(sku) : entities.encodeXML(_id),
         title: variant.title ? entities.encodeXML(variant.title) : null,
         imageUrls: variant.media.map((image) => image.URLs.large).filter((url) => url !== variantPrimaryImageUrl),
-        variantPrimaryImageUrl,
+        primaryImageUrl: variantPrimaryImageUrl ? variantPrimaryImageUrl : primaryImageUrl,
         isSoldOut: variant.isSoldOut,
         price: `${variantFirstFoundCurrencyPricing?.price ? variantFirstFoundCurrencyPricing?.price : variantFirstFoundCurrencyPricing?.minPrice} ${variantFirstFoundCurrency}`,
         sku: variant.sku ? entities.encodeXML(variant.sku) : null,
