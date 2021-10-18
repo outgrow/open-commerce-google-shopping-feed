@@ -24,8 +24,8 @@ function variantAttribute(variant) {
 
   if (["size", "color", "pattern", "material", "gender"].includes(attributeLabel)) {
     return {
-      [attributeLabel]: variant.optionTitle.toLowerCase()
-    }
+      [attributeLabel]: variant.optionTitle
+    };
   }
 
   return {};
