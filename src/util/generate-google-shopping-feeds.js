@@ -188,7 +188,7 @@ async function getProductFeedItems(context, shopId) {
         description: description ? entities.encodeXML(stripHtml(description).result) : null, // strip out potential HTML tags
         itemGroupId: sku ? entities.encodeXML(sku) : entities.encodeXML(_id),
         title: variant.title ? entities.encodeXML(variant.title) : null,
-        imageUrls: variant.media.map((image) => image.URLs.large).filter((url) => url !== variantPrimaryImageUrl),
+        imageUrls: variant.media.map((image) => image.URLs.large).filter((url) => url !== variantPrimaryImageUrl).slice(0, 10),
         primaryImageUrl: variantPrimaryImageUrl ? variantPrimaryImageUrl : primaryImageUrl,
         isSoldOut: variant.isSoldOut,
         price: `${variantFirstFoundCurrencyPricing?.price ? variantFirstFoundCurrencyPricing?.price : variantFirstFoundCurrencyPricing?.minPrice} ${variantFirstFoundCurrency}`,
@@ -206,7 +206,7 @@ async function getProductFeedItems(context, shopId) {
         barcode: barcode ? entities.encodeXML(barcode) : null,
         currency: firstFoundCurrency,
         description: description ? entities.encodeXML(stripHtml(description).result) : null, // strip out potential HTML tags
-        imageUrls: media.map((image) => image.URLs.large).filter((url) => url !== primaryImageUrl),
+        imageUrls: media.map((image) => image.URLs.large).filter((url) => url !== primaryImageUrl).slice(0, 10),
         primaryImageUrl,
         isSoldOut,
         price: `${firstFoundCurrencyPricing?.minPrice ? firstFoundCurrencyPricing?.minPrice : firstFoundCurrencyPricing?.price} ${firstFoundCurrency}`,
